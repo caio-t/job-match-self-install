@@ -1,6 +1,6 @@
 ---
 name: job-match
-description: Procura vagas de emprego e ordena-as pelo match com o CV do utilizador — numa empresa específica (ex. "vagas da Aubay") ou no mercado em geral. Lê o CV da pasta onde a sessão começou; se não houver, pede o CV ou o PDF do perfil do LinkedIn. Lista 10 vagas por omissão (ou o número pedido) com local, regime, match, porquê, lacunas e link. A pedido, cria um CV em PDF à medida de uma vaga, só com factos do CV. Use quando o utilizador pede vagas, oportunidades, "jobs que combinam comigo", "top N vagas na empresa X", o match do perfil com vagas, ou "faz o CV para a vaga X".
+description: Procura vagas de emprego e ordena-as pelo match com o CV do utilizador — numa empresa específica (ex. "vagas da Aubay") ou no mercado em geral. Lê o CV da pasta onde a sessão começou; se não houver, pede o CV ou lê o perfil do LinkedIn. Lista 10 vagas por omissão (ou o número pedido) com local, regime, match, porquê, lacunas e link. A pedido, cria um CV em PDF à medida de uma vaga, só com factos do CV. Use quando o utilizador pede vagas, oportunidades, "jobs que combinam comigo", "top N vagas na empresa X", o match do perfil com vagas, ou "faz o CV para a vaga X".
 ---
 
 # Job Match
@@ -14,7 +14,7 @@ o utilizador o pede. Candidatar e preencher formulários ficam fora da skill e e
 A skill funciona no Claude Code e na app do Claude (claude.ai, desktop, telemóvel). Na app:
 - não há pasta de trabalho: usa o CV **anexado à conversa**; se não houver, pede-o;
 - onde o texto fala em AskUserQuestion, faz a pergunta no chat;
-- se uma página não se lê com as ferramentas web, dá o link e pede ao utilizador que cole o texto;
+- sem o Claude in Chrome ligado, pede ao utilizador que cole o texto do perfil ou da vaga;
 - os ficheiros gerados (CV, carta) entregam-se para **descarregar**, não se gravam numa pasta.
 
 ## Entradas
@@ -40,9 +40,9 @@ Tira do pedido do utilizador (pergunta só o que for indispensável):
    ficheiros usaste.
 3. **Se não houver nenhum**, pergunta ao utilizador (AskUserQuestion) e não avances sem resposta:
    - "Indicar o caminho do CV", ou
-   - "Usar o meu perfil do LinkedIn": pede ao utilizador que exporte o perfil em PDF (no perfil,
-     **Mais → Guardar em PDF**) e o anexe, ou que cole o texto. Não abras nem leias o LinkedIn por
-     conta própria: os termos do LinkedIn proíbem o acesso automatizado.
+   - "Ler o meu perfil do LinkedIn": abre o perfil no browser do utilizador (Claude in Chrome) em
+     `linkedin.com/in/<perfil>/` e lê as secções de experiência, formação, competências e línguas.
+     Se o URL do perfil não for conhecido, pede-o.
 4. **Monta um resumo do perfil apenas com factos do CV**: cargo e senioridade, anos de experiência,
    stack com anos quando indicados, liderança e arquitetura, domínios, línguas e nível, local e regime
    pretendido. **Nunca inventes competências.** O que não está no CV é lacuna, não match.
@@ -54,9 +54,9 @@ Usa as melhores fontes para o pedido, por esta ordem, e verifica sempre a vaga n
 **Com empresa indicada:**
 1. **Página de carreiras da empresa**: é a fonte de verdade. Encontra o URL real a partir da navegação
    do site oficial (o link "Carreiras/Careers"); não adivinhes caminhos.
-2. O feed público do portal de recrutamento da empresa, se existir (ver abaixo).
-3. Agregadores e LinkedIn Jobs só através dos resultados de pesquisa, para descobrir vagas que
-   faltem; confirma cada uma na página da empresa, porque os agregadores mostram vagas fechadas.
+2. LinkedIn Jobs filtrado pela empresa.
+3. Agregadores (Glassdoor, Indeed, ITJobs, Talent.com, beBee) só para descobrir vagas que faltem;
+   confirma cada uma na página da empresa, porque os agregadores mostram vagas fechadas.
 
 **Sem empresa (mercado em geral), por região:**
 - **Portugal:** ITJobs.pt, LinkedIn Jobs, Landing.jobs, Net-Empregos, Indeed PT, Glassdoor PT, Teamlyzer
@@ -66,21 +66,18 @@ Usa as melhores fontes para o pedido, por esta ordem, e verifica sempre a vaga n
 - **Outros países:** LinkedIn Jobs e o Indeed do país.
 
 Faz as pesquisas independentes em paralelo (WebSearch, várias queries no mesmo turno). Para ler
-páginas usa as ferramentas de leitura web (WebFetch ou equivalente).
+páginas usa WebFetch ou o agente `web-fetch`; para sites que só carregam com JavaScript ou exigem
+sessão (LinkedIn), usa o browser do utilizador.
 
-**LinkedIn, Indeed e Glassdoor** proíbem nos termos de uso a recolha automatizada. Destes sites usa
-só o que vem nos resultados de pesquisa (título, empresa, link); não abras, não percorras listagens
-e não entres com a sessão do utilizador. Para a descrição completa, procura a mesma vaga na página
-da empresa ou dá o link ao utilizador.
+### Técnicas que funcionam em páginas de carreiras
 
-### Ler páginas de carreiras
-
-- **Feeds públicos dos portais de recrutamento.** Muitas empresas publicam as vagas num portal
-  (Greenhouse, Lever, Workable, Recruitee, SmartRecruiters, Teamtailor) que tem um feed ou API
-  pública documentada para listar vagas. Prefere esse feed à página quando existir.
-- **Se a página carregar as vagas por JavaScript** e o texto não aparecer, não leias dados internos
-  da página nem chames endpoints não documentados: usa o feed público do portal ou dá o link ao
-  utilizador.
+- **Muitas páginas carregam as vagas por JavaScript.** Se a extração de texto só mostrar algumas vagas
+  ou um botão "Ver mais", lê os dados da página em vez de clicar:
+  - Next.js: `document.getElementById('__NEXT_DATA__')`, procurando um array `jobs` (ou parecido);
+  - procura em `performance.getEntriesByType('resource')` por endpoints `/api/...` (ex. `/api/job?id=`)
+    e chama-os com `fetch` a partir da própria página para obter a descrição completa;
+  - portais comuns: Teamtailor, SmartRecruiters, Recruitee, Workable, Greenhouse, Lever (muitos têm
+    feed JSON público).
 - **Recusa os cookies não essenciais** quando aparece o banner.
 - **Guarda o link direto de cada vaga** (ex. `.../carreira?o=<id>`), não só o da listagem.
 - **Campos vazios não são dados.** Se o regime (híbrido/remoto/presencial) ou o local estiverem em
@@ -135,7 +132,7 @@ Tech Lead"). Se a vaga não estiver na lista desta sessão, pede o link e lê a 
    "A vaga pede X. Tens experiência? Quantos anos?". Só o que o utilizador confirmar entra no CV,
    com as palavras e os anos que ele der. Sem resposta, fica de fora.
 3. **Escreve o CV no idioma da vaga** (vaga em inglês → CV em inglês), a partir de
-   [templates/cv-template.md](templates/cv-template.md) (o HTML do modelo está no bloco de código):
+   [templates/cv-template.html](templates/cv-template.html):
    - **Título**: o cargo da vaga + as 3 ou 4 tecnologias principais que o utilizador tem.
    - **Resumo** (3 a 4 linhas): anos de experiência, foco atual e as tecnologias pedidas que tem.
    - **Pontos fortes para a vaga**: 4 a 5 bullets, cada um ligado a um requisito da vaga.
@@ -173,5 +170,3 @@ Tech Lead"). Se a vaga não estiver na lista desta sessão, pede o link e lê a 
 - No CV à medida, não inventes nem aumentes nada: nem anos, nem cargos, nem certificações, nem graus
   académicos. Um curso não concluído aparece como tal (ex. "Master's coursework in ...").
 - Não guardes dados pessoais do utilizador (telefone, e-mail, morada) em ficheiros desta skill.
-- Respeita os termos de uso e o `robots.txt` de cada site. Não entres em páginas que exigem login,
-  não contornes bloqueios nem CAPTCHAs e lê só as páginas necessárias para o pedido.
