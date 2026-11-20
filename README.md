@@ -26,11 +26,11 @@ Made by **Caio Teixeira** · [LinkedIn](https://www.linkedin.com/in/caio-teixeir
 > - The software is provided **"as is", without warranty**, under the [MIT License](LICENSE).
 >
 > If you don't accept these terms, don't install it. Use the reviewed version on the
-> [`main` branch](https://github.com/caio-t/job-match) instead.
+> [job-match](https://github.com/caio-t/job-match) repository instead.
 
-### What's different from `main`
+### What's different from the directory version
 
-| | `main` (Claude directory) | `self-install` (this branch) |
+| | [job-match](https://github.com/caio-t/job-match) (Claude directory) | job-match-self-install (this repository) |
 |---|---|---|
 | LinkedIn profile | You export it as PDF or paste it | Opened and read in your browser |
 | LinkedIn / Indeed / Glassdoor | Only what search results show | Browsed with your session |
@@ -40,14 +40,13 @@ Made by **Caio Teixeira** · [LinkedIn](https://www.linkedin.com/in/caio-teixeir
 
 ### Install (manual, Claude Code only)
 
-There is no one-click install on purpose. Download this branch
-(**Code → Download ZIP** on GitHub, with the `self-install` branch selected) and copy the
-`skills/job-match` folder to `~/.claude/skills/job-match`. Then start a new Claude Code session.
+There is no one-click install on purpose. Download this repository
+(**Code → Download ZIP** on GitHub) and copy the `skills/job-match` folder to `~/.claude/skills/job-match`. Then start a new Claude Code session.
 
-The browser features need the Claude in Chrome extension. Don't install it next to the `main` version
-of the plugin: both are called `job-match`.
+The browser features need the Claude in Chrome extension. Don't install it next to the directory
+version of the plugin: both are called `job-match`.
 
-How it works and usage examples: see the [`main` README](https://github.com/caio-t/job-match#readme).
+How it works and usage examples: see the [job-match README](https://github.com/caio-t/job-match#readme).
 
 ---
 
@@ -66,15 +65,15 @@ How it works and usage examples: see the [`main` README](https://github.com/caio
 > - O software é fornecido **"tal como está", sem garantias**, sob a [licença MIT](LICENSE).
 >
 > Se não aceitas estas condições, não a instales. Usa a versão revista do
-> [branch `main`](https://github.com/caio-t/job-match).
+> [repositório job-match](https://github.com/caio-t/job-match).
 
 ### Instalar (manual, só Claude Code)
 
-De propósito, não há instalação com um clique. Descarrega este branch (**Code → Download ZIP** no
-GitHub, com o branch `self-install` escolhido) e copia a pasta `skills/job-match` para
+De propósito, não há instalação com um clique. Descarrega este repositório (**Code → Download ZIP**
+no GitHub) e copia a pasta `skills/job-match` para
 `~/.claude/skills/job-match`. Depois abre uma sessão nova do Claude Code.
 
-As funções de browser precisam da extensão Claude in Chrome. Não a instales ao lado da versão `main`
+As funções de browser precisam da extensão Claude in Chrome. Não a instales ao lado da versão da loja
 do plugin: as duas chamam-se `job-match`.
 
 ## License
